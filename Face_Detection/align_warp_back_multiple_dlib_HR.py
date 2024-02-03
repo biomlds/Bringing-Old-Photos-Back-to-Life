@@ -215,14 +215,13 @@ def blur_blending(im1, im2, mask):
 
 
 def blur_blending_cv2(im1, im2, mask):
-
-    mask *= 255.0
+    mask = np.multiply(mask, 255.0, out=np.zeros_like(mask), casting="unsafe")
 
     kernel = np.ones((9, 9), np.uint8)
-    mask = cv2.erode(mask, kernel, iterations=3)
+    mask = cv2.erode(mask.astype(np.uint8), kernel, iterations=3)
 
     mask_blur = cv2.GaussianBlur(mask, (25, 25), 0)
-    mask_blur /= 255.0
+    mask_blur = mask_blur.astype(float) / 255.0  # Convert to float before division
 
     im = im1 * mask_blur + (1 - mask_blur) * im2
 
@@ -230,6 +229,7 @@ def blur_blending_cv2(im1, im2, mask):
     im = np.clip(im, 0.0, 1.0)
 
     return im
+
 
 
 # def Poisson_blending(im1,im2,mask):
